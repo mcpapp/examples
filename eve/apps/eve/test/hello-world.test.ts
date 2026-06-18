@@ -71,6 +71,55 @@ describe("hello world app", () => {
     }
   });
 
+  it("keeps the deterministic fixture spec aligned with the hello world tool", async () => {
+    const previousFixtureMode = process.env.EVE_TEST_FIXTURE;
+    try {
+      process.env.EVE_TEST_FIXTURE = "1";
+      const model = resolveModel();
+      if (typeof model === "string") throw new Error("Expected fixture model.");
+
+      const result = await model.doGenerate({
+        prompt: [
+          {
+            role: "tool",
+            content: [
+              {
+                output: { type: "text", value: "ok" },
+                toolCallId: "call_hello_world",
+                toolName: "hello_world",
+                type: "tool-result",
+              },
+            ],
+          },
+        ],
+      } as never);
+      const finalOutputCall = result.content.find(
+        (part): part is {
+          readonly input: string;
+          readonly toolCallId: string;
+          readonly toolName: string;
+          readonly type: "tool-call";
+        } =>
+          part.type === "tool-call" &&
+          "toolName" in part &&
+          part.toolName === "final_output" &&
+          "input" in part &&
+          typeof part.input === "string",
+      );
+
+      expect(finalOutputCall?.type).toBe("tool-call");
+      expect(JSON.parse(finalOutputCall?.input ?? "null")).toEqual(
+        helloWorldSpec(),
+      );
+    } finally {
+      if (previousFixtureMode === undefined) {
+        delete process.env.EVE_TEST_FIXTURE;
+      } else {
+        process.env.EVE_TEST_FIXTURE = previousFixtureMode;
+      }
+    }
+  });
+
   it("does not define custom Eve session routes", () => {
     const files = [
       ...filesUnder(join(process.cwd(), "agent")),
