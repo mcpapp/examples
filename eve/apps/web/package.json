@@ -11,7 +11,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@mcpapp/eve": "^0.1.0",
+    "@mcpapp/eve": "^0.1.1",
     "@mcpapp/react": "^0.2.0",
     "eve": "^0.11.3",
     "next": "^16.2.9",

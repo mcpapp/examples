@@ -49,8 +49,8 @@ importers:
   apps/web:
     dependencies:
       '@mcpapp/eve':
-        specifier: ^0.1.0
-        version: 0.1.0(@mcpapp/react@0.2.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tailwindcss@4.3.1)(zod@4.4.3))(eve@0.11.3(@vercel/blob@2.4.0)(ai@7.0.0-beta.178(zod@4.4.3))(chokidar@4.0.0)(lru-cache@11.5.1)(next@16.2.9(@playwright/test@1.61.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(vite@8.0.16(@types/node@24.13.2)(esbuild@0.27.0)(tsx@4.21.0)))(next@16.2.9(@playwright/test@1.61.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: ^0.1.1
+        version: 0.1.1(@mcpapp/react@0.2.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tailwindcss@4.3.1)(zod@4.4.3))(eve@0.11.3(@vercel/blob@2.4.0)(ai@7.0.0-beta.178(zod@4.4.3))(chokidar@4.0.0)(lru-cache@11.5.1)(next@16.2.9(@playwright/test@1.61.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(vite@8.0.16(@types/node@24.13.2)(esbuild@0.27.0)(tsx@4.21.0)))(next@16.2.9(@playwright/test@1.61.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@mcpapp/react':
         specifier: ^0.2.0
         version: 0.2.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tailwindcss@4.3.1)(zod@4.4.3)
@@ -528,8 +528,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  '@mcpapp/eve@0.1.0':
-    resolution: {integrity: sha512-ZcbfdYEGIYd7BiFDFoD3EfNzufPvn7jEArqPuqIT4vfJt9G+a1i9kKWnbVjEtKpyvnkU6ERoQO5A8baoOoZZAw==}
+  '@mcpapp/eve@0.1.1':
+    resolution: {integrity: sha512-7pWDnDfC1F7+eKF/e+a+Whd+Tt74q4yhvIAuh7fS5hyFTqbCpkIg7xV+aSvx6UNwwUTPDEiDZC4m7743bgwdug==}
     peerDependencies:
       '@mcpapp/react': '>=0.1.0 <0.3.0'
       eve: ^0.11.3
@@ -4320,7 +4320,7 @@ snapshots:
       - encoding
       - supports-color
 
-  '@mcpapp/eve@0.1.0(@mcpapp/react@0.2.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tailwindcss@4.3.1)(zod@4.4.3))(eve@0.11.3(@vercel/blob@2.4.0)(ai@7.0.0-beta.178(zod@4.4.3))(chokidar@4.0.0)(lru-cache@11.5.1)(next@16.2.9(@playwright/test@1.61.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(vite@8.0.16(@types/node@24.13.2)(esbuild@0.27.0)(tsx@4.21.0)))(next@16.2.9(@playwright/test@1.61.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@mcpapp/eve@0.1.1(@mcpapp/react@0.2.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tailwindcss@4.3.1)(zod@4.4.3))(eve@0.11.3(@vercel/blob@2.4.0)(ai@7.0.0-beta.178(zod@4.4.3))(chokidar@4.0.0)(lru-cache@11.5.1)(next@16.2.9(@playwright/test@1.61.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(vite@8.0.16(@types/node@24.13.2)(esbuild@0.27.0)(tsx@4.21.0)))(next@16.2.9(@playwright/test@1.61.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@mcpapp/react': 0.2.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(tailwindcss@4.3.1)(zod@4.4.3)
       eve: 0.11.3(@vercel/blob@2.4.0)(ai@7.0.0-beta.178(zod@4.4.3))(chokidar@4.0.0)(lru-cache@11.5.1)(next@16.2.9(@playwright/test@1.61.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(vite@8.0.16(@types/node@24.13.2)(esbuild@0.27.0)(tsx@4.21.0))
