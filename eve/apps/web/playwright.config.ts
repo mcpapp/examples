@@ -15,7 +15,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `pnpm --filter eve-web exec next dev --port ${webPort}`,
+    command: `EVE_TEST_FIXTURE=1 pnpm --filter eve-web exec next dev --port ${webPort}`,
     reuseExistingServer: true,
     timeout: 180_000,
     url: `http://127.0.0.1:${webPort}`,

@@ -1,12 +1,20 @@
 import { describe, expect, it } from "vitest";
 import { defaultWebSpecSchema } from "@mcpapp/react/server";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 import helloWorldTool, {
   helloWorldSpec,
 } from "../agent/tools/hello_world.js";
-import {
-  helloWorldStream,
-  useModelBackedEveChannel,
-} from "../src/hello-world-session.js";
+import { resolveModel, useFixtureModel } from "../agent/agent.js";
+
+function filesUnder(root: string): readonly string[] {
+  if (!existsSync(root)) return [];
+
+  return readdirSync(root).flatMap((entry) => {
+    const path = join(root, entry);
+    return statSync(path).isDirectory() ? filesUnder(path) : [path];
+  });
+}
 
 describe("hello world app", () => {
   it("builds a valid MCPApp spec", () => {
@@ -23,33 +31,58 @@ describe("hello world app", () => {
     );
   });
 
-  it("serves deterministic Eve session streams by default", async () => {
-    const previousModelMode = process.env.EVE_USE_MODEL;
+  it("uses the configured model by default", () => {
+    const previousFixtureMode = process.env.EVE_TEST_FIXTURE;
+    const previousModel = process.env.EVE_MODEL;
     try {
-      delete process.env.EVE_USE_MODEL;
-      expect(useModelBackedEveChannel()).toBe(false);
+      delete process.env.EVE_TEST_FIXTURE;
+      process.env.EVE_MODEL = "openai/gpt-5-mini";
+      expect(useFixtureModel()).toBe(false);
+      expect(resolveModel()).toBe("openai/gpt-5-mini");
     } finally {
-      if (previousModelMode === undefined) {
-        delete process.env.EVE_USE_MODEL;
+      if (previousFixtureMode === undefined) {
+        delete process.env.EVE_TEST_FIXTURE;
       } else {
-        process.env.EVE_USE_MODEL = previousModelMode;
+        process.env.EVE_TEST_FIXTURE = previousFixtureMode;
+      }
+      if (previousModel === undefined) {
+        delete process.env.EVE_MODEL;
+      } else {
+        process.env.EVE_MODEL = previousModel;
       }
     }
-
-    await expect(helloWorldStream().text()).resolves.toContain("Hello world");
   });
 
-  it("can opt into model-backed Eve sessions", () => {
-    const previousModelMode = process.env.EVE_USE_MODEL;
+  it("can use a deterministic fixture model", () => {
+    const previousFixtureMode = process.env.EVE_TEST_FIXTURE;
     try {
-      process.env.EVE_USE_MODEL = "1";
-      expect(useModelBackedEveChannel()).toBe(true);
+      process.env.EVE_TEST_FIXTURE = "1";
+      expect(useFixtureModel()).toBe(true);
+      expect(resolveModel()).toMatchObject({
+        modelId: "eve-mcpapp-fixture",
+        provider: "eve-fixture",
+      });
     } finally {
-      if (previousModelMode === undefined) {
-        delete process.env.EVE_USE_MODEL;
+      if (previousFixtureMode === undefined) {
+        delete process.env.EVE_TEST_FIXTURE;
       } else {
-        process.env.EVE_USE_MODEL = previousModelMode;
+        process.env.EVE_TEST_FIXTURE = previousFixtureMode;
       }
     }
+  });
+
+  it("does not define custom Eve session routes", () => {
+    const files = [
+      ...filesUnder(join(process.cwd(), "agent")),
+      ...filesUnder(join(process.cwd(), "src")),
+    ].filter((file) => /\.ts$/.test(file));
+    const violations = files.filter((file) => {
+      const source = readFileSync(file, "utf8");
+      return /defineChannel|POST\("\/eve\/v1\/session|GET\("\/eve\/v1\/session\/:sessionId\/stream/.test(
+        source,
+      );
+    });
+
+    expect(violations).toEqual([]);
   });
 });

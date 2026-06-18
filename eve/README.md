@@ -7,8 +7,8 @@ shell, and Eve owns json-render spec generation.
 
 - `apps/web` is a Next.js shell. It delegates Eve session loading and MCPApp
   event forwarding to `@mcpapp/eve`, then renders the returned spec.
-- `apps/eve` is the backend. It serves a hello world MCPApp spec through Eve's
-  native session endpoints.
+- `apps/eve` is the backend. Eve runs the native model/tool/output-schema loop
+  and returns a hello world MCPApp spec from a tool.
 
 There are no domain REST endpoints. The browser uses only Eve's session
 contract under `/eve/v1/session*`.
@@ -23,8 +23,8 @@ event authority:
 export { EveMCPAppServer as default } from "@mcpapp/eve/next";
 ```
 
-Eve owns json-render spec generation. Specs are projected from native Eve
-stream events.
+Eve owns json-render spec generation. The `hello_world` tool returns a
+validated spec, and Eve streams it as structured output.
 
 ## Initial Render
 
@@ -41,11 +41,9 @@ pnpm dev
 ```
 
 The web app defaults to `http://127.0.0.1:3000`. `eve/next` starts and proxies
-the Eve runtime for local development. The default path is deterministic and
-does not need model credentials. Set `EVE_USE_MODEL=1` plus
-`AI_GATEWAY_API_KEY` to route requests through the model-backed Eve agent loop.
-The model path defaults to `openai/gpt-5-nano`; set `EVE_MODEL` to use a
-different AI Gateway model.
+the Eve runtime for local development. Native model-backed runs need
+`AI_GATEWAY_API_KEY`. The model path defaults to `openai/gpt-5-nano`; set
+`EVE_MODEL` to use a different AI Gateway model.
 
 ## Useful commands
 
@@ -58,5 +56,7 @@ pnpm --filter eve-agent eve:channels
 WEB_PORT=3001 pnpm --filter eve-web test:e2e
 ```
 
-`test:e2e` uses the same deterministic Eve `/eve/v1/session*` channel as local
-development. The web app does not define fixture routes.
+`test:e2e` runs with `EVE_TEST_FIXTURE=1`, which swaps in a deterministic mock
+model while still exercising Eve's native `/eve/v1/session*` channel, tool
+execution, structured output, and stream events. Real model-backed runs reflect
+provider latency.
