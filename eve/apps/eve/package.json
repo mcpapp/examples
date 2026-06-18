@@ -1,0 +1,26 @@
+{
+  "name": "eve-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "eve dev --no-ui",
+    "start": "eve start",
+    "build": "eve build",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "eve:info": "eve info --json",
+    "eve:channels": "eve channels list --json"
+  },
+  "dependencies": {
+    "@mcpapp/react": "^0.2.0",
+    "eve": "^0.11.3",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.2",
+    "typescript": "^5.9.3",
+    "vercel": "^54.14.2",
+    "vitest": "^4.1.9"
+  }
+}

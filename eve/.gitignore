@@ -1,0 +1,15 @@
+node_modules/
+.next/
+.output/
+.vercel/
+dist/
+coverage/
+test-results/
+playwright-report/
+.turbo/
+.cache/
+.eve/
+.workflow-data/
+.env
+.env.local
+*.tsbuildinfo
