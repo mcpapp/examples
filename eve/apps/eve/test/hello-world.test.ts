@@ -4,9 +4,9 @@ import helloWorldTool, {
   helloWorldSpec,
 } from "../agent/tools/hello_world.js";
 import {
-  fixtureStream,
-  useFixtureEveChannel,
-} from "./fixtures/eve-session-fixture.js";
+  helloWorldStream,
+  useModelBackedEveChannel,
+} from "../src/hello-world-session.js";
 
 describe("hello world app", () => {
   it("builds a valid MCPApp spec", () => {
@@ -23,19 +23,33 @@ describe("hello world app", () => {
     );
   });
 
-  it("serves deterministic Eve session fixture streams for browser e2e", async () => {
-    const previousFixtureMode = process.env.EVE_TEST_FIXTURE;
+  it("serves deterministic Eve session streams by default", async () => {
+    const previousModelMode = process.env.EVE_USE_MODEL;
     try {
-      process.env.EVE_TEST_FIXTURE = "1";
-      expect(useFixtureEveChannel()).toBe(true);
+      delete process.env.EVE_USE_MODEL;
+      expect(useModelBackedEveChannel()).toBe(false);
     } finally {
-      if (previousFixtureMode === undefined) {
-        delete process.env.EVE_TEST_FIXTURE;
+      if (previousModelMode === undefined) {
+        delete process.env.EVE_USE_MODEL;
       } else {
-        process.env.EVE_TEST_FIXTURE = previousFixtureMode;
+        process.env.EVE_USE_MODEL = previousModelMode;
       }
     }
 
-    await expect(fixtureStream().text()).resolves.toContain("Hello world");
+    await expect(helloWorldStream().text()).resolves.toContain("Hello world");
+  });
+
+  it("can opt into model-backed Eve sessions", () => {
+    const previousModelMode = process.env.EVE_USE_MODEL;
+    try {
+      process.env.EVE_USE_MODEL = "1";
+      expect(useModelBackedEveChannel()).toBe(true);
+    } finally {
+      if (previousModelMode === undefined) {
+        delete process.env.EVE_USE_MODEL;
+      } else {
+        process.env.EVE_USE_MODEL = previousModelMode;
+      }
+    }
   });
 });
