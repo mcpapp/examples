@@ -1,21 +1,55 @@
 import { defineAgent, type AgentDefinition } from "eve";
 import { defaultWebSpecSchema } from "@mcpapp/react/server";
-import { MockLanguageModelV3, simulateReadableStream } from "ai/test";
 import type { LanguageModel } from "ai";
 
 type FixtureGenerateResult = Awaited<
-  ReturnType<MockLanguageModelV3["doGenerate"]>
+  ReturnType<FixtureLanguageModel["doGenerate"]>
 >;
 type FixturePrompt =
-  Parameters<MockLanguageModelV3["doGenerate"]>[0]["prompt"];
-type FixtureStreamResult = Awaited<ReturnType<MockLanguageModelV3["doStream"]>>;
+  Parameters<FixtureLanguageModel["doGenerate"]>[0]["prompt"];
+type FixtureStreamResult = Awaited<ReturnType<FixtureLanguageModel["doStream"]>>;
 type FixtureStreamPart =
   FixtureStreamResult["stream"] extends ReadableStream<infer Part>
     ? Part
     : never;
+type FixtureLanguageModel = Extract<
+  LanguageModel,
+  { readonly specificationVersion: "v3" }
+>;
 
 const fixtureModelId = "eve-mcpapp-fixture";
 const finalOutputToolName = "final_output";
+const fixtureSpec = defaultWebSpecSchema.parse({
+  root: "root",
+  elements: {
+    root: {
+      type: "Stack",
+      props: {
+        gap: 3,
+        padding: 4,
+      },
+      children: ["heading", "message"],
+      visible: true,
+    },
+    heading: {
+      type: "Heading",
+      props: {
+        level: "h1",
+        text: "Hello world",
+      },
+      children: [],
+      visible: true,
+    },
+    message: {
+      type: "Text",
+      props: {
+        text: "This MCPApp spec was served by Eve.",
+      },
+      children: [],
+      visible: true,
+    },
+  },
+});
 
 const agent: AgentDefinition = defineAgent({
   model: resolveModel(),
@@ -35,21 +69,23 @@ export function resolveModel(): LanguageModel | string {
 }
 
 function createFixtureModel(): LanguageModel {
-  return new MockLanguageModelV3({
+  return {
+    specificationVersion: "v3",
     modelId: fixtureModelId,
     provider: "eve-fixture",
+    supportedUrls: {},
     async doGenerate({ prompt }) {
       return fixtureResultForPrompt(prompt);
     },
     async doStream({ prompt }) {
       return fixtureStreamResult(fixtureResultForPrompt(prompt));
     },
-  });
+  } satisfies FixtureLanguageModel;
 }
 
 function fixtureResultForPrompt(prompt: FixturePrompt): FixtureGenerateResult {
   return hasToolResult(prompt, "hello_world")
-    ? fixtureToolCallResult(finalOutputToolName, fixtureSpec())
+    ? fixtureToolCallResult(finalOutputToolName, fixtureSpec)
     : fixtureToolCallResult("hello_world", {});
 }
 
@@ -83,44 +119,21 @@ function fixtureStreamResult(
   ];
 
   return {
-    stream: simulateReadableStream({
-      chunks,
-      chunkDelayInMs: null,
-      initialDelayInMs: null,
-    }),
+    stream: readableStreamFrom(chunks),
   };
 }
 
-function fixtureSpec(): unknown {
-  return defaultWebSpecSchema.parse({
-    root: "root",
-    elements: {
-      root: {
-        type: "Stack",
-        props: {
-          gap: 3,
-          padding: 4,
-        },
-        children: ["heading", "message"],
-        visible: true,
-      },
-      heading: {
-        type: "Heading",
-        props: {
-          level: "h1",
-          text: "Hello world",
-        },
-        children: [],
-        visible: true,
-      },
-      message: {
-        type: "Text",
-        props: {
-          text: "This MCPApp spec was served by Eve.",
-        },
-        children: [],
-        visible: true,
-      },
+function readableStreamFrom<T>(chunks: readonly T[]): ReadableStream<T> {
+  let index = 0;
+  return new ReadableStream({
+    pull(controller) {
+      const chunk = chunks[index];
+      if (chunk === undefined) {
+        controller.close();
+        return;
+      }
+      index += 1;
+      controller.enqueue(chunk);
     },
   });
 }
